@@ -1,0 +1,21 @@
+librosa>=0.10.0
+soundfile
+matplotlib
+seaborn
+pandas
+numpy
+tqdm
+scipy
+pandas>=2.0
+numpy==1.26.4
+matplotlib>=3.7
+seaborn>=0.12
+scikit-learn>=1.3
+xgboost>=2.0
+librosa>=0.10
+opencv-python<4.13
+Pillow>=10.0
+tqdm
+joblib
+deepface>=0.0.93                           # more modern, easier install on some systems
+tensorflow==2.16.2
