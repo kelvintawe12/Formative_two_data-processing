@@ -10,9 +10,9 @@ from sklearn.preprocessing import LabelEncoder
 import joblib
 import librosa
 import soundfile as sf
-from deepface import DeepFace  # or MobileNet logic
+# from deepface import DeepFace  # Not needed; using MobileNet
 import tensorflow as tf
-from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 import warnings
 warnings.filterwarnings('ignore')
@@ -25,8 +25,8 @@ KNOWN_KELVIN_EMB_PATH = DATA_DIR / 'image_features.csv'  # kelvin embeddings
 
 class SecureRecommenderDemo:
     def __init__(self):
-        self.face_extractor = tf.keras.models.load_model(str(BASE_DIR / 'models' / 'face_feature_extractor.h5'))
-        self.face_model = joblib.load(MODELS_DIR / 'face_model.joblib')
+        self.face_extractor = MobileNetV2(weights='imagenet', include_top=False, pooling='avg', input_shape=(224, 224, 3))
+        # self.face_model = joblib.load(MODELS_DIR / 'face_model.joblib')  # No classifier trained; similarity used
         self.voice_model = joblib.load(MODELS_DIR / 'voice_model.joblib')
         self.recommender_model = joblib.load(MODELS_DIR / 'recommender_model.joblib')
         self.voice_scaler = joblib.load(MODELS_DIR / 'voice_scaler.joblib')
@@ -76,7 +76,8 @@ class SecureRecommenderDemo:
         sample = self.df_merged[self.df_merged['customer_id'] == customer_id].drop(columns=['product_category']).fillna(0).iloc[0:1]
         pred = self.recommender_model.predict(sample)[0]
         proba = self.recommender_model.predict_proba(sample).max()
-        product = self.le.inverse_transform([pred])[0]  # Assume le saved or fit here
+        self.le = LabelEncoder().fit(self.df_merged['product_category']) if not hasattr(self, 'le') else self.le
+        product = self.le.inverse_transform([pred])[0]
         return customer_id, product, proba
 
     def run_flow(self, img_path, audio_path):
