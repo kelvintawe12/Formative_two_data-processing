@@ -19,9 +19,23 @@ Secure product recommendation system with face + voice authentication before rec
 cd multimodal-secure-recommender
 source ../venv/bin/activate  # if venv
 pip install -r requirements.txt
-python scripts/demo.py  # Success: kelvin neutral + approve -> APPROVED Electronics
-python scripts/demo.py --unauthorized  # Deny: surprised + nick -> FACE/VOICE DENIED
+
+# Success (Kelvin)
+python scripts/demo.py --image data/images/kelvin_neutral.png --audio data/audio/kelvin_yes_approve.m4a
+
+# Alternate success
+python scripts/demo.py --image data/images/kelvin_smile.png --audio data/audio/kelvin_confirm_tx.m4a
+
+# Unauthorized face (low sim)
+python scripts/demo.py --image data/images/kelvin_surprised.png --audio data/audio/kelvin_yes_approve.m4a
+
+# Unauthorized voice (nick)
+python scripts/demo.py --image data/images/kelvin_neutral.png --audio data/audio/nick_confirm_txt.m4a
+
+# Full unauthorized
+python scripts/demo.py --image data/images/kelvin_surprised.png --audio data/audio/nick_yes_approve.m4a
 ```
+Expected: Success APPROVED, unauthorized DENIED at face/voice.
 
 Sample Success:
 ```
