@@ -67,7 +67,7 @@ class SecureRecommenderDemo:
         prob = self.voice_model.predict_proba(features)[0].max()
         label = self.voice_encoder.inverse_transform([pred])[0]
         print(f'Voice prediction: {label} (conf: {prob:.3f})')
-        return label == 'approve' and prob > 0.7, prob
+        return label == 'kelvin' and prob > 0.7, prob
 
     def recommend_product(self, customer_id=None):
         """Sample rec from merged data."""
@@ -104,7 +104,7 @@ def main():
 
     if args.unauthorized:
         args.image = 'data/images/kelvin_surprised.png'  # Sim wrong
-        args.audio = 'data/audio/nick_confirm_txt.m4a'
+        args.audio = 'data/audio/nick_confirm_tx.m4a'
         print('🧪 Running UNAUTHORIZED sim...')
 
     demo = SecureRecommenderDemo()
