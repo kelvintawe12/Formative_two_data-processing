@@ -26,10 +26,10 @@ class Config:
     UNAUTHORIZED_IMAGES_DIR = os.path.join(IMAGES_DIR, 'unauthorized')
     
     # Use the properly trained models
-    FACE_MODEL = os.path.join(MODELS_DIR, 'face_classifier_fixed.joblib')
-    VOICE_MODEL = os.path.join(MODELS_DIR, 'voice_model_fixed.joblib')
-    VOICE_SCALER = os.path.join(MODELS_DIR, 'voice_scaler_fixed.joblib')
-    VOICE_ENCODER = os.path.join(MODELS_DIR, 'voice_encoder_fixed.joblib')
+    FACE_MODEL = os.path.join(MODELS_DIR, 'face_classifier.joblib')
+    VOICE_MODEL = os.path.join(MODELS_DIR, 'voice_model_rf_v2.joblib')
+    VOICE_SCALER = os.path.join(MODELS_DIR, 'voice_scaler_v2.joblib')
+    VOICE_ENCODER = os.path.join(MODELS_DIR, 'voice_label_encoder_v2.joblib')
     PRODUCT_MODEL = os.path.join(MODELS_DIR, 'product_model_retrained.json')
     PRODUCT_ENCODER = os.path.join(MODELS_DIR, 'product_label_encoder.joblib')
     
@@ -370,7 +370,7 @@ def main():
         elif choice == '6':
             demo.run_unauthorized_voice_demo()
         elif choice == '7':
-            print("\n Goodbye!")
+            print("\n Good Bye!")
             break
 
 if __name__ == "__main__":
