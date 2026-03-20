@@ -1,71 +1,134 @@
 # Multimodal Secure Recommender System
-## Formative 2 - Data Processing & Authentication (40/40 Rubric)
+## Formative 2 - Data Processing & Authentication 
 
 ### Overview
-Secure product recommendation system with face + voice authentication before rec display. Flow: face -> product call -> voice approve -> rec.
+This is a secure product recommendation system that uses **multimodal biometric authentication** combining face recognition and voice verification. To receive personalized product recommendation, users must pass both authentication layers.
 
-### Structure
-- `data/raw/`: CSV (social_profiles, transactions), images (kelvin neutral/smile/surprised), audio (yes_approve, confirm_tx for kelvin/nick)
-- `data/processed/`: image_features.csv (MobileNet1280 + hist + aug x7), audio_features.csv (MFCC20 deltas + spectral + aug x5), merged_features.csv
-- `notebooks/`: 01_eda_merge (plots/stats/merge/RFM), 02_image (aug/face detect/MobileNet), 03_audio (wave/spec/MFCC + RF voiceprint eval), 04_training, 05_eval
-- `scripts/demo.py`: CLI sim (success w/ kelvin, deny unauthorized nick)
-- `src/models/`: face.py, voice.py, recommender.py (RF/XGB)
-- `models/`: .joblib/.h5 trained
-- `tests/`: feature shapes, merge
-- `reports/`: Formative2_Report_Tawe_etal.pdf
+### Features
+- **Face Recognition**: Random Forest classifier trained on 63 facial images (3 expressions × 3 users × 7 augmentations)
+- **Voice Verification**: Random Forest classifier using MFCC features from 36 audio samples (2 phrases × 3 users × 6 augmentations)
+- **Product Recommendation**: XGBoost model trained on customer transaction data with personalized recommendations
+- **Security**: Unauthorized face or voice attempts are immediately rejected
 
-### Quick Start (Demo)
+### Project Structure
+
+
+### Quick Start
+
+#### Installation
 ```bash
-cd multimodal-secure-recommender
-source ../venv/bin/activate  # if venv
+# Clone the repository
+git clone https://github.com/kelvintawe12/Formative_two_data-processing.git
+cd Formative_two_data-processing/multimodal-secure-recommender
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Success (Kelvin)
-python scripts/demo.py --image data/images/kelvin_neutral.png --audio data/audio/kelvin_yes_approve.m4a
-
-# Alternate success
-python scripts/demo.py --image data/images/kelvin_smile.png --audio data/audio/kelvin_confirm_tx.m4a
-
-# Unauthorized face (low sim)
-python scripts/demo.py --image data/images/kelvin_surprised.png --audio data/audio/kelvin_yes_approve.m4a
-
-# Unauthorized voice (nick)
-python scripts/demo.py --image data/images/kelvin_neutral.png --audio data/audio/nick_confirm_txt.m4a
-
-# Full unauthorized
-python scripts/demo.py --image data/images/kelvin_surprised.png --audio data/audio/nick_yes_approve.m4a
-```
-Expected: Success APPROVED, unauthorized DENIED at face/voice.
-
-Sample Success:
-```
-Secure Flow Starting...
-Face similarity: 0.626 Authorized
-Voice features: (1,86) padded
-Voice kelvin (0.608) Verified
-APPROVED! Rec cust1: Electronics (0.850) [demo]
 ```
 
-### Rubric Coverage (Exemplary)
-| Criteria | Status |
-|----------|--------|
-| EDA ≥3 plots/stats | 01.ipynb (box, hist, corr heat) |
-| Merge/validation | RFM agg, null checks |
-| Images 3 expr + aug | kelvin3, 7 aug/image, MobileNet+hist CSV |
-| Audio 2 phrases + aug/vis | kelvin/nick, 5 aug, wave/spec/MFCC CSV |
-| Models (face/voice/rec) | RF/XGB, joblib saved |
-| Eval metrics | Acc/F1/CM in notebooks |
-| CLI sim + unauthorized | demo.py success/deny |
-| Submission/docs | Report, notebooks, clean |
-
-### Dependencies
+### Run the Demo
 ```bash
-pip install numpy pandas scikit-learn librosa tensorflow matplotlib seaborn joblib soundfile tqdm xgboost
+cd scripts
+python demo.py
+```
+
+### Demo menu options
+┌──────────────────────────────────────────────────┐
+│  1. Run ALL scenarios (full demo)                │
+│  2. Authorized user - Cynthia                    │
+│  3. Authorized user - Kelvin                     │
+│  4. Authorized user - Nick                       │
+│  5. Unauthorized face attempt                    │
+│  6. Unauthorized voice attempt                   │
+│  7. Exit                                         │
+└──────────────────────────────────────────────────┘
+
+### Sample output
+======================================================================
+  SCENARIO: AUTHORIZED USER - Cynthia
+======================================================================
+
+   STEP 1: FACE RECOGNITION
+  ----------------------------------------
+  • Analyzing face: Cynthia_neutral.jpeg
+   Face recognized as: Cynthia
+  • Confidence: 86.06%
+
+   STEP 2: VOICE VERIFICATION
+  ----------------------------------------
+  • Verifying voice: Cynthia_yes_approve.m4a
+   Voice verified as: Cynthia
+  • Confidence: 69.14%
+
+   STEP 3: PRODUCT RECOMMENDATION
+  ----------------------------------------
+  • Generating recommendations for: Cynthia
+
+   ALL CHECKS PASSED - ACCESS GRANTED
+
+   TOP RECOMMENDATIONS:
+     1. Books        [█████████░░░░░░░░░░░] 45.0%
+     2. Clothing     [█████░░░░░░░░░░░░░░░] 25.0%
+     3. Electronics  [███░░░░░░░░░░░░░░░░░] 15.0%
+
+  User: Cynthia | Face: 86.06% | Voice: 69.14%
+  Top Pick: Books
+
+### Unauthorized attempt
+
+ACCESS DENIED: Face not recognized
+
+#### Unauthorized Voice (Cynthia's face + Kelvin's voice):
+
+Face recognized as: Cynthia
+VOICE MISMATCH! Expected Cynthia, got kelvin
+ACCESS DENIED: Voice verification failed
+
+### Data Collection & Processing
+
+**Image Data**
+
+* 3 users: Cynthia, kelvin, nick
+
+* 3 expressions per user: neutral, smile, surprised
+
+* 7 augmentations per image: rotation, flipping, brightness, contrast, grayscale, shear, zoom
+
+* Feature extraction: MobileNet embeddings (1280) + histogram features (768) + statistics (4)
+
+* Total: 63 samples × 2052 features
+
+**Audio Data**
+
+* 2 phrases per user: "Yes approve", "Confirm transaction"
+
+* 5 augmentations per sample: pitch shift (up/down), time stretch (faster/slower), background noise
+
+* Feature extraction: 20 MFCC coefficients + deltas + delta-deltas + spectral features
+
+* Total: 36 samples × 126 features
+
+### Dependencies 
+```bash
+pip install -r requirements.txt
 ```
 
 ### Contributors
-Kelvin Tawe et al. – data collection, preprocessing, models, demo.
 
-Video Demo: [link]
-GitHub: https://github.com/kelvintawe12/Formative_two_data-processing
-Report: reports/Formative2_Report_Tawe_etal.pdf
+1. Kelvin Tawe – Data collection, preprocessing, model development, demo implementation
+
+2. Cynthia Mutie – Audio collection, feature extraction, evaluation
+
+3. Nick-Lemy – Image collection, augmentation, documentation
+
+### Links
+
+* GitHub Repository: https://github.com/kelvintawe12/Formative_two_data-processing
+
+* Video Demo: https://youtu.be/qANhWk67rqk
+
+* Final Report: 
