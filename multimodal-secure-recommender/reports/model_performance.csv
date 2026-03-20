@@ -1,0 +1,4 @@
+Model,Accuracy,F1-Score
+Face Recognition,1.0,1.0
+Voiceprint,1.0,1.0
+Product Recommender,0.6136363636363636,0.6176767676767677
